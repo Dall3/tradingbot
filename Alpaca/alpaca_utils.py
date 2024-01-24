@@ -10,4 +10,4 @@ def get_latest_prices(api, positions):
             symbol = position.symbol
             latest_price = api.get_latest_trade(symbol).price
             print(f"Symbol: {symbol}, Värde: {latest_price}")
-        time.sleep(1)
+        time.sleep(5)

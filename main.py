@@ -2,6 +2,7 @@
 Huvudfil för min trading bot
 """
 import time
+import random 
 import json 
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import GetAssetsRequest, MarketOrderRequest
@@ -17,15 +18,13 @@ API_KEY = config["api_key"]
 API_SECRET = config["api_secret"]
 BASE_URL = config["base_url"]
 
+asset_symbols = []
+
 def main():
     """
     """
     api = tradeapi.REST(API_KEY, API_SECRET, base_url=BASE_URL, api_version="v2")
     account_info = api.get_account()
-
-    # Check if our account is restricted from trading.
-    if account_info.trading_blocked:
-        print('Account is currently restricted from trading.')
 
     while True:
         print("\nAlternativ:")
@@ -35,6 +34,7 @@ def main():
         print("4. Lägg order")
         print("5. För att se vad vi hämtar för account information")
         print("6. Prisuppdatering på aktier")
+        print("7. Köp random aktier")
         print("q. Avsluta")
         
         choice = input("Val: ") 
@@ -78,11 +78,26 @@ def main():
         elif choice == "6":
             positions = get_all_positions(api)
             get_latest_prices(api, positions)
+        
+        elif choice == "7":
+            active_assets = api.list_assets(status='active')
+            for asset in active_assets:
+                asset_symbols.append(asset.symbol)
+                
+            random_symbols = random.sample(asset_symbols, 20)
+            for i in random_symbols:
+                api.submit_order(
+                symbol=i,
+                qty=10,
+                side="buy",
+                type="market",
+                time_in_force="gtc"
+            )
 
         elif choice == "q":
             print("Avslutar")
             break
-    
+
         else:
             print("Ogiltigt")
 
